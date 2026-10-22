@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+.venv/
+__pycache__/
+.pytest_cache/
+dist/
+*.db
+*.db-journal
+.env
+*.mp4
+*.wav
+*.onnx
+*.bin
