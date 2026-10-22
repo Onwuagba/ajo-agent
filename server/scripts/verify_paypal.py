@@ -50,7 +50,7 @@ if args.payout_to:
     b = step("Create payout batch (1.00 USD)", lambda: gw.create_payout(key, items))
     if b:
         step("Look the batch up", lambda: gw.get_payout(b["batch_id"]))
-        step("Same sender_batch_id again is refused or deduplicated by PayPal", lambda: gw.create_payout(key, items))
+        step("Same sender_batch_id again is refused or deduplicated by PayPal", lambda: (lambda r: r if r.get("duplicate") else (_ for _ in ()).throw(PayPalError("paid twice")))(gw.create_payout(key, items)))
 else:
     results.append(("Create payout batch", False, "skipped: pass --payout-to <sandbox personal account email>"))
 step("Webhook signature check rejects a bad signature", lambda: (_ for _ in ()).throw(PayPalError("unexpected")) if gw.verify_webhook({"paypal-transmission-sig": "bad"}, b"{}") else "rejected, as it should")

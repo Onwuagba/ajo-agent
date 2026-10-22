@@ -2,6 +2,7 @@
 STATUS: written against the docs, NOT yet exercised against a live sandbox account. Every method here is a [VERIFY] item until it has run once."""
 from __future__ import annotations
 
+import re
 import base64
 import json
 import time
@@ -40,7 +41,7 @@ class RealGateway:
             h["PayPal-Request-Id"] = request_id            # PayPal's own idempotency header
         r = self.http.request(method, path, headers=h, content=json.dumps(body) if body is not None else None)
         if r.status_code >= 300:
-            raise PayPalError(f"{method} {path} -> {r.status_code}: {r.text[:300]}")
+            raise PayPalError(f"{method} {path} -> {r.status_code}: {r.text[:900]}")
         return r.json() if r.content else {}
 
     def create_plan(self, name, amount, currency, interval_days):
@@ -63,7 +64,13 @@ class RealGateway:
         body = {"sender_batch_header": {"sender_batch_id": sender_batch_id, "email_subject": "Your Ajo payout"},
                 "items": [{"recipient_type": "EMAIL", "amount": {"value": f"{i['amount']:.2f}", "currency": i["currency"]}, "receiver": i["receiver_email"], "note": i.get("note", ""),
                            "sender_item_id": i["sender_item_id"]} for i in items]}
-        j = self._call("POST", "/v1/payments/payouts", body, request_id=sender_batch_id)
+        try:
+            j = self._call("POST", "/v1/payments/payouts", body, request_id=sender_batch_id)
+        except PayPalError as e:
+            # PayPal refuses a repeated sender_batch_id and links to the batch that already exists: report it, don't pay twice
+            m = re.search(r"already exists.*?/v1/payments/payouts/([A-Z0-9]+)", str(e))
+            if not m: raise
+            return {"batch_id": m.group(1), "status": self.get_payout(m.group(1))["status"], "duplicate": True}
         return {"batch_id": j["batch_header"]["payout_batch_id"], "status": j["batch_header"]["batch_status"], "duplicate": False}
 
     def get_payout(self, batch_id):
