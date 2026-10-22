@@ -34,7 +34,7 @@ def step(name: str, fn):
         results.append((name, False, str(e)[:220])); return None
 
 
-step("OAuth token", gw._token)
+step("OAuth token", lambda: "received" if gw._token() else "")
 plan = step("Create product and billing plan (14 day, 1.00 USD)", lambda: gw.create_plan(f"Ajo verify {uuid.uuid4().hex[:5]}", 1.0, "USD", 14))
 if plan:
     sub = step("Create subscription (returns an approval link)", lambda: gw.create_subscription(plan, "buyer@example.com", "Test Buyer"))

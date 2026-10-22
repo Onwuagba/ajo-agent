@@ -21,7 +21,7 @@ No keys needed. If [Ollama](https://ollama.com) is running, Ajo uses a local mod
 
 ## What's real and what isn't
 
-The PayPal **simulator** is the default and is clearly labelled in the UI. The real sandbox client (`server/ajo/paypal/real.py`) was written from PayPal's docs and tested against a mocked transport; `server/scripts/verify_paypal.py` runs it against a live sandbox, and that has not been done yet. No real money moves anywhere. See [`server/README.md`](server/README.md) for the API and details, and [`docs/FEATURES.md`](docs/FEATURES.md) for the feature design.
+The PayPal **simulator** is the default and is clearly labelled in the UI. The real sandbox client (`server/ajo/paypal/real.py`) has been run against the live PayPal sandbox with `server/scripts/verify_paypal.py` (OAuth, billing plan, subscription with approval link, invoice create, send and remind, and webhook signature rejection all pass on 2026-10-22). The payout batch is verified when you pass a sandbox personal account email with `--payout-to`. Incoming webhooks need a public URL. No real money moves anywhere. See [`server/README.md`](server/README.md) for the API and details, and [`docs/FEATURES.md`](docs/FEATURES.md) for the feature design.
 
 The demo video was recorded and edited with the scripts in [`video/`](video/).
 
