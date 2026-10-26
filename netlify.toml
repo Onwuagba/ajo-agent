@@ -1,0 +1,10 @@
+# The web app. The API runs elsewhere (see render.yaml); set VITE_API_URL in Netlify to its URL.
+[build]
+  base = "web"
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

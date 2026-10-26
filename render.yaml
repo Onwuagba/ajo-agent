@@ -1,0 +1,27 @@
+# API host (the web app goes on Netlify). Secrets are set in the Render dashboard, never committed.
+services:
+  - type: web
+    name: ajo-api
+    runtime: docker
+    rootDir: server
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: AJO_CORS            # the Netlify site's URL, e.g. https://ajo-yourname.netlify.app (comma-separate several)
+        sync: false
+      - key: PAYPAL_MODE         # fake (built-in simulator) or sandbox
+        value: fake
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: AJO_LLM             # none | openai_compat | anthropic. (auto/ollama only work where Ollama is running)
+        value: none
+      - key: AJO_LLM_BASE_URL
+        sync: false
+      - key: AJO_LLM_API_KEY
+        sync: false
+      - key: AJO_LLM_MODEL
+        sync: false
